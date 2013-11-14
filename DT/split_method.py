@@ -27,7 +27,7 @@ class GiniSplitMethod(SplitMethod):
             for value in feature.values:
                 p = float(pos_count[value]) / total_count[value]
                 current_pure += float(total_count[value]) / dt_len* (2 * p - 2 * p * p)
-            return dt_pure - current_pure
+            return dt_pure - current_pure, None
 
         elif feature_type == FeatureType.CONTINUAL:
             f_id = feature.id
@@ -51,11 +51,14 @@ class GiniSplitMethod(SplitMethod):
                     continue
                 former_p = float(former_pos_count) / former_count
                 latter_p = float(total_pos_count - former_pos_count) / (total_count - former_count)
-                current_pure = 
-                latter_count = 
-
-
-
+                current_pure = float(former_count)/total_count * (2 * former_p - 2 * former_p * former_p) \
+                    + float(total_count - former_count)/total_count * (2 * latter_p - 2 * latter_p * latter_p)
+                
+                gain = dt_pure - current_pure
+                if gain > max_gain:
+                    max_gain = gain
+                    threshold = sample.features[f_id]
+            return max_gain, threshold
 
 
     def calc_pure(dataset):
