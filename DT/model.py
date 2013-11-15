@@ -14,5 +14,15 @@ class DT_Model:
     def load_model(self):
         return
     
-    def save_model(self):
-        return
+    def save_model(self, data_path):
+        f_model = open(data_path)
+        save_tree(self.root, 0, f_model)
+
+    def save_tree(self, root, height, f_model):
+        if root.is_leaf:
+            print >>f_model, "".join(["\t"] * height), self.data_count, self.prob 
+            return
+        print >>f_model, "".join(["\t"] * height), self.data_count, self,split_feature, self.split_feature_threshold 
+        
+        for sub in self.children:
+            self.save_tree(sub, height + 1, f_model)
