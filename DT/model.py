@@ -3,7 +3,7 @@ from feature import *
 
 class DT_Model:
     def __init__(self):
-        self.root = TreeNode()
+        self.root = None 
         self.features = {}
 
     def load_feature(self, data_path):

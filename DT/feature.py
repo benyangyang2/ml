@@ -1,6 +1,6 @@
 class FeatureType:
-    DISCRETE = 0
-    CONTINUAL = 1
+    CONTINUAL = 0
+    DISCRETE = 1
 
 class Feature:
     def __init__(self, line):

@@ -3,6 +3,7 @@ from model import *
 from tree_node import *
 from sample import *
 from model import *
+from split_method import *
 
 class DT_Trainer:
     def __init__(self, max_height, min_tree_size, split_method):
@@ -16,26 +17,30 @@ class DT_Trainer:
         for line in open(data_path):
             sample = DT_Sample(line)
             self.dataset.append(sample)
+        print "Finish load dataset, size is:", len(self.dataset)
 
     def load_feature_list(self, data_path):
         self.model.load_feature(data_path)
+        print "Finish load feature, size is:", len(self.model.features)
+        print self.model.features
 
-    def train(self, dataset):
-        self.model.root = self.build_tree(dataset)
+    def train(self):
+        self.model.root = self.build_tree(self.dataset, [], 0)
 
     def build_tree(self, dataset, visited_feature_ids, height):
         data_count = len(dataset)
         pos_count = get_pos_count(dataset)
-        if data_count <= self.min_tree_size || height >= self.max_height \
-            || pos_count == data_count || pos_count == 0:
+        if data_count <= self.min_tree_size or height >= self.max_height \
+            or pos_count == data_count or pos_count == 0:
             return LeafNode(data_count, pos_count)
             
         dt_pure = self.split_method.calc_pure(dataset)
         max_gain = 0
         best_feature = None
         best_threshold = None
-        for feature in self.model.features:
-            if feature.id in visited_feature_ids:
+        for f_id in self.model.features.keys():
+            feature = self.model.features[f_id]
+            if f_id in visited_feature_ids:
                 continue
             gain, threshold = self.split_method.get_max_pure_gain(dataset, feature, dt_pure)
             if gain > max_gain:
@@ -47,9 +52,11 @@ class DT_Trainer:
         if feature.type == FeatureType.DISCRETE:
             visited_feature_ids.append(best_feature.id)
         root = MiddleNode(data_count, best_feature, best_threshold)
+        print "------------Build middle node:", max_gain, height, best_feature.id, best_threshold, data_count
         splited_datasets = self.split_dataset(dataset, best_feature, best_threshold)
         for sub_dt in splited_datasets:
-            root.add_child(self.build_tree(sub_dt, visited_feature_ids, height + 1)
+            print len(sub_dt) 
+            root.add_child(self.build_tree(sub_dt, visited_feature_ids, height + 1))
         return root
     
     def split_dataset(self, dataset, feature, threshold):
@@ -60,16 +67,19 @@ class DT_Trainer:
                 dt = new_datasets.get(f_value, [])
                 dt.append(sample)
                 new_datasets[f_value] = dt
+            return new_datasets.values()
         else:
             new_datasets = [[], []]
             for sample in dataset:
                 f_value = sample.features[feature.id]
-                if f_value <= threshold:
+                if float(f_value) <= float(threshold):
                     new_datasets[0].append(sample)
                 else:
                     new_datasets[1].append(sample)
-        return new_datasets.values()
-                 
-            
-       
+            return new_datasets
 
+if __name__=='__main__':
+    trainer = DT_Trainer(20, 10, GiniSplitMethod())
+    trainer.load_dataset("/mnt/recdata/momData/dataset/syw/samples_train_10w.txt")          
+    trainer.load_feature_list("/mnt/recdata/momData/dataset/syw/feature.txt")
+    trainer.train()

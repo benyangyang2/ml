@@ -1,5 +1,5 @@
 from sample import *
-from feature_type import *
+from feature import *
 class SplitMethod:
     def __init__(self):
         pass
@@ -23,15 +23,17 @@ class GiniSplitMethod(SplitMethod):
                 f_value = sample.features[f_id]
                 total_count[f_value] += 1
                 if sample.label is True:
-                    pos_count += 1
+                    pos_count[f_value] += 1
             for value in feature.values:
-                p = float(pos_count[value]) / total_count[value]
+                p = float(pos_count[value]) / total_count[value] if total_count[value] != 0 else 0
                 current_pure += float(total_count[value]) / dt_len* (2 * p - 2 * p * p)
             return dt_pure - current_pure, None
 
-        elif feature_type == FeatureType.CONTINUAL:
+        elif feature.type == FeatureType.CONTINUAL:
             f_id = feature.id
-            sorted_dt = sorted(dataset, key=lambda sample:sample.features[f_id])
+            sorted_dt = sorted(dataset, key=lambda sample:float(sample.features[f_id]))
+            if f_id == 11 or f_id == 3 or f_id == 9:
+                print f_id, sorted_dt[0].features[f_id], sorted_dt[-1].features[f_id]
             total_count = len(dataset)
             total_pos_count = 0
             for sample in sorted_dt:
@@ -61,7 +63,7 @@ class GiniSplitMethod(SplitMethod):
             return max_gain, threshold
 
 
-    def calc_pure(dataset):
+    def calc_pure(self, dataset):
         total_count = len(dataset)
         pos_count = 0
         for sample in dataset:

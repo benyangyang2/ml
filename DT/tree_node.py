@@ -1,4 +1,4 @@
-from feature_type import *
+from feature import *
 class TreeNode:
    def __init__(self, is_leaf):
        pass
