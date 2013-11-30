@@ -16,13 +16,13 @@ class DT_Trainer:
     def load_dataset(self, data_path):
         for line in open(data_path):
             sample = DT_Sample(line)
+            #sample = BinarySample(line, self.model.features)
             self.dataset.append(sample)
         print "Finish load dataset, size is:", len(self.dataset)
 
     def load_feature_list(self, data_path):
         self.model.load_feature(data_path)
         print "Finish load feature, size is:", len(self.model.features)
-        print self.model.features
 
     def train(self):
         self.model.root = self.build_tree(self.dataset, [], 0)
@@ -51,25 +51,26 @@ class DT_Trainer:
             return LeafNode(data_count, pos_count)
         if feature.type == FeatureType.DISCRETE:
             visited_feature_ids.append(best_feature.id)
-        root = MiddleNode(data_count, best_feature, best_threshold)
-        print "------------Build middle node:", max_gain, height, best_feature.id, best_threshold, data_count
+        root = MiddleNode(data_count, pos_count, best_feature, best_threshold)
+        #print "------------Build middle node:", max_gain, height, best_feature.id, best_threshold, data_count
         splited_datasets = self.split_dataset(dataset, best_feature, best_threshold)
-        for sub_dt in splited_datasets:
-            print len(sub_dt) 
-            root.add_child(self.build_tree(sub_dt, visited_feature_ids, height + 1))
+        for feature_value in splited_datasets.keys():
+            sub_dt = splited_datasets[feature_value]
+            root.add_child(self.build_tree(sub_dt, visited_feature_ids, height + 1), feature_value)
         return root
     
     def split_dataset(self, dataset, feature, threshold):
         if feature.type == FeatureType.DISCRETE:
             new_datasets = {}
             for sample in dataset:
-                f_value = sample.features[feature.id]
+                #f_value = sample.features[feature.id]
+                f_value = sample.features.get(feature.id, "0")
                 dt = new_datasets.get(f_value, [])
                 dt.append(sample)
                 new_datasets[f_value] = dt
-            return new_datasets.values()
+            return new_datasets
         else:
-            new_datasets = [[], []]
+            new_datasets = {0: [], 1:[]}
             for sample in dataset:
                 f_value = sample.features[feature.id]
                 if float(f_value) <= float(threshold):
@@ -83,3 +84,4 @@ if __name__=='__main__':
     trainer.load_dataset("/mnt/recdata/momData/dataset/syw/samples_train_10w.txt")          
     trainer.load_feature_list("/mnt/recdata/momData/dataset/syw/feature.txt")
     trainer.train()
+    trainer.model.save_model("model1.txt")
