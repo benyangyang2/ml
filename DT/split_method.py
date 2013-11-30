@@ -1,14 +1,9 @@
+import math
 from sample import *
 from feature import *
 class SplitMethod:
     def __init__(self):
         pass
-    def get_max_pure_gain(self, dataset, dt_pure):
-        raise NotImplementedError('SplitMethod.get_max_pure_gain is an abstract function')
-    def calc_pure(self, dataset):
-        raise NotImplementedError('SplitMethod.calc_pure is an abstract function')
-
-class GiniSplitMethod(SplitMethod):
     def get_max_pure_gain(self, dataset, feature, dt_pure):
         if feature.type == FeatureType.DISCRETE:
             current_pure = 0
@@ -20,20 +15,19 @@ class GiniSplitMethod(SplitMethod):
                 total_count[value] = 0
                 pos_count[value] = 0
             for sample in dataset:
-                f_value = sample.features[f_id]
+                #f_value = sample.features[f_id]
+                f_value = sample.features.get(f_id, "0")
                 total_count[f_value] += 1
                 if sample.label is True:
                     pos_count[f_value] += 1
             for value in feature.values:
                 p = float(pos_count[value]) / total_count[value] if total_count[value] != 0 else 0
-                current_pure += float(total_count[value]) / dt_len* (2 * p - 2 * p * p)
+                current_pure += float(total_count[value]) / dt_len * self.calc_binary_pure(p) 
             return dt_pure - current_pure, None
 
         elif feature.type == FeatureType.CONTINUAL:
             f_id = feature.id
             sorted_dt = sorted(dataset, key=lambda sample:float(sample.features[f_id]))
-            if f_id == 11 or f_id == 3 or f_id == 9:
-                print f_id, sorted_dt[0].features[f_id], sorted_dt[-1].features[f_id]
             total_count = len(dataset)
             total_pos_count = 0
             for sample in sorted_dt:
@@ -53,15 +47,14 @@ class GiniSplitMethod(SplitMethod):
                     continue
                 former_p = float(former_pos_count) / former_count
                 latter_p = float(total_pos_count - former_pos_count) / (total_count - former_count)
-                current_pure = float(former_count)/total_count * (2 * former_p - 2 * former_p * former_p) \
-                    + float(total_count - former_count)/total_count * (2 * latter_p - 2 * latter_p * latter_p)
+                current_pure = float(former_count)/total_count * self.calc_binary_pure(former_p) \
+                    + float(total_count - former_count)/total_count * self.calc_binary_pure(latter_p) 
                 
                 gain = dt_pure - current_pure
                 if gain > max_gain:
                     max_gain = gain
                     threshold = sample.features[f_id]
             return max_gain, threshold
-
 
     def calc_pure(self, dataset):
         total_count = len(dataset)
@@ -70,6 +63,20 @@ class GiniSplitMethod(SplitMethod):
             if sample.label is True:
                 pos_count += 1
         p = float(pos_count) / total_count
+        return self.calc_binary_pure(p)
+    
+    def calc_binary_pure(self, p):
+        raise NotImplementedError('SplitMethod.calc_binary_pure is an abstract function')
+
+class GiniSplitMethod(SplitMethod):
+    def calc_binary_pure(self, p):
         return 2 * p - 2 * p * p
+
+
+class EntropySplitMethod(SplitMethod):
+    def calc_binary_pure(self, p):
+        if p == 0 or p == 1:
+            return 0
+        return - p * math.log(p) - (1 - p) * math.log(1 - p)
 
 
