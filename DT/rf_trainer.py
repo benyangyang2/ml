@@ -1,10 +1,10 @@
 import sys
-from model import *
+from dt_model import *
 from tree_node import *
 from sample import *
-from model import *
+from dt_model import *
 from rf_model import *
-from trainer import *
+from dt_trainer import *
 from split_method import *
 from random import * 
 

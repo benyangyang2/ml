@@ -28,3 +28,22 @@ class DT_Model:
         
         for sub in root.children:
             self.save_tree(sub, height + 1, f_model)
+    
+    def predict(self, sample):
+        return self.predict_sample(sample, self.root)
+
+    def predict_sample(self, sample, root):
+        if root.is_leaf:
+            return root.prob
+        split_feature = root.split_feature
+        sample_feature_value = sample.features.get(split_feature.id, "0")
+        if split_feature.type == FeatureType.DISCRETE:
+            if not sample_feature_value in root.split_value_2_index:
+                return root.prob
+            i = root.split_value_2_index[sample_feature_value]
+            return self.predict_sample(sample, root.children[i])
+        else:
+            if float(sample_feature_value) <= float(root.split_feature_threshold):
+                return self.predict_sample(sample, root.children[0])
+            else:
+                return self.predict_sample(sample, root.children[1])

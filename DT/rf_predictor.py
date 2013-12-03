@@ -1,8 +1,8 @@
 import sys
-from model import *
+from dt_model import *
 from tree_node import *
 from sample import *
-from model import *
+from dt_model import *
 from split_method import *
 
 class RF_Predictor:

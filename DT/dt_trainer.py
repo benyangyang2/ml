@@ -1,8 +1,8 @@
 import sys
-from model import *
+from dt_model import *
 from tree_node import *
 from sample import *
-from model import *
+from dt_model import *
 from split_method import *
 
 class DT_Trainer:
@@ -20,9 +20,15 @@ class DT_Trainer:
             self.dataset.append(sample)
         print "Finish load dataset, size is:", len(self.dataset)
 
+    def set_dataset(self, dataset):
+        self.dataset = dataset
+
     def load_feature_list(self, data_path):
         self.model.load_feature(data_path)
         print "Finish load feature, size is:", len(self.model.features)
+
+    def set_feature_list(self, feature_list):
+        self.model.features = feature_list
 
     def train(self):
         self.model.root = self.build_tree(self.dataset, [], 0)

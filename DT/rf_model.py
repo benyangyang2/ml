@@ -1,6 +1,6 @@
 from tree_node import *
 from feature import *
-from model import *
+from dt_model import *
 
 class RF_Model:
     def __init__(self):
