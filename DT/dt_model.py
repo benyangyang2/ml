@@ -30,9 +30,9 @@ class DT_Model:
             self.save_tree(sub, height + 1, f_model)
     
     def predict(self, sample):
-        return self.predict_sample(sample, self.root)
+        return self.predict_recur(sample, self.root)
 
-    def predict_sample(self, sample, root):
+    def predict_recur(self, sample, root):
         if root.is_leaf:
             return root.prob
         split_feature = root.split_feature
@@ -41,9 +41,9 @@ class DT_Model:
             if not sample_feature_value in root.split_value_2_index:
                 return root.prob
             i = root.split_value_2_index[sample_feature_value]
-            return self.predict_sample(sample, root.children[i])
+            return self.predict_recur(sample, root.children[i])
         else:
             if float(sample_feature_value) <= float(root.split_feature_threshold):
-                return self.predict_sample(sample, root.children[0])
+                return self.predict_recur(sample, root.children[0])
             else:
-                return self.predict_sample(sample, root.children[1])
+                return self.predict_recur(sample, root.children[1])

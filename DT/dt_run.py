@@ -11,11 +11,9 @@ if __name__=='__main__':
     min_size = int(sys.argv[3])
     trainer = DT_Trainer(max_height, min_size, EntropySplitMethod())
     start = time.time()
-    data_path = "/mnt/recdata/momData/dataset/syw/"
+    data_path = "/mnt/recdata/momData/dataset/"
     trainer.load_feature_list(data_path + pre_name + ".feature")
     trainer.load_dataset(data_path + pre_name + ".data.dt")
-    #trainer.load_dataset("/mnt/recdata/momData/dataset/syw/samples_train.txt")          
-    #trainer.load_feature_list("/mnt/recdata/momData/dataset/syw/feature.txt")
     elapsed = time.time() - start
     print "Loading time:", elapsed
 

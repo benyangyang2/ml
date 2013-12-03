@@ -26,23 +26,5 @@ class DT_Predictor:
         f_out = open(out_file, "w")
         for sample in self.dataset:
             label = "1" if sample.label else "0"
-            print >>f_out, label, self.predict_sample(sample, self.model.root)
-
-    def predict_sample(self, sample, root):
-        if root.is_leaf:
-            return root.prob
-        split_feature = root.split_feature
-        sample_feature_value = sample.features.get(split_feature.id, "0")
-        if split_feature.type == FeatureType.DISCRETE:
-            if not sample_feature_value in root.split_value_2_index:
-                return root.prob
-            i = root.split_value_2_index[sample_feature_value]
-            return self.predict_sample(sample, root.children[i])
-        else:
-            if float(sample_feature_value) <= float(root.split_feature_threshold):
-                return self.predict_sample(sample, root.children[0])
-            else:
-                return self.predict_sample(sample, root.children[1])
-                
-
+            print >>f_out, label, self.model.predict(sample)
 
