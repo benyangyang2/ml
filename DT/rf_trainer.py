@@ -21,7 +21,7 @@ class RF_Trainer:
 
     def load_dataset(self, data_path):
         for line in open(data_path):
-            sample = DT_Sample(line)
+            sample = DT_Sample(line, len(self.features))
             #sample = BinarySample(line, self.model.features)
             self.dataset.append(sample)
         print "Finish load dataset, size is:", len(self.dataset)
@@ -30,7 +30,7 @@ class RF_Trainer:
         for line in open(data_path):
             feature = Feature(line)
             self.features[feature.id] = feature
-        #self.model.load_feature(data_path)
+        self.model.features = self.features
         print "Finish load feature, size is:", len(self.features)
 
     def train(self):
@@ -55,9 +55,3 @@ class RF_Trainer:
 
             self.model.add_dt_model(dt_trainer.model)
 
-if __name__=='__main__':
-    trainer = DT_Trainer(20, 10, GiniSplitMethod())
-    trainer.load_dataset("/mnt/recdata/momData/dataset/syw/samples_train_10w.txt")          
-    trainer.load_feature_list("/mnt/recdata/momData/dataset/syw/feature.txt")
-    trainer.train()
-    trainer.model.save_model("model1.txt")

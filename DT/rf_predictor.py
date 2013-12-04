@@ -13,7 +13,7 @@ class RF_Predictor:
     def load_dataset(self, data_path):
         for line in open(data_path):
             #sample = BinarySample(line, self.model.features)
-            sample = DT_Sample(line)
+            sample = DT_Sample(line, len(self.model.features))
             self.dataset.append(sample)
         print "Finish load dataset, size is:", len(self.dataset)
 

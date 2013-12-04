@@ -15,8 +15,8 @@ class SplitMethod:
                 total_count[value] = 0
                 pos_count[value] = 0
             for sample in dataset:
-                #f_value = sample.features[f_id]
-                f_value = sample.features.get(f_id, "0")
+                f_value = sample.features[f_id]
+                #f_value = sample.features.get(f_id, "0")
                 total_count[f_value] += 1
                 if sample.label is True:
                     pos_count[f_value] += 1

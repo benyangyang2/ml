@@ -36,7 +36,8 @@ class DT_Model:
         if root.is_leaf:
             return root.prob
         split_feature = root.split_feature
-        sample_feature_value = sample.features.get(split_feature.id, "0")
+        #sample_feature_value = sample.features.get(split_feature.id, "0")
+        sample_feature_value = sample.features[split_feature.id]
         if split_feature.type == FeatureType.DISCRETE:
             if not sample_feature_value in root.split_value_2_index:
                 return root.prob

@@ -15,7 +15,7 @@ class DT_Trainer:
 
     def load_dataset(self, data_path):
         for line in open(data_path):
-            sample = DT_Sample(line)
+            sample = DT_Sample(line, len(self.model.features))
             #sample = BinarySample(line, self.model.features)
             self.dataset.append(sample)
         print "Finish load dataset, size is:", len(self.dataset)
@@ -69,8 +69,8 @@ class DT_Trainer:
         if feature.type == FeatureType.DISCRETE:
             new_datasets = {}
             for sample in dataset:
-                #f_value = sample.features[feature.id]
-                f_value = sample.features.get(feature.id, "0")
+                f_value = sample.features[feature.id]
+                #f_value = sample.features.get(feature.id, "0")
                 dt = new_datasets.get(f_value, [])
                 dt.append(sample)
                 new_datasets[f_value] = dt
