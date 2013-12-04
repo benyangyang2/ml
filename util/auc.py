@@ -3,7 +3,6 @@ import time
 import random
 import sys
 from operator import itemgetter
-import MySQLdb
 
 def auc(result):
     pn = 0
